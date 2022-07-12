@@ -82,7 +82,30 @@ def test_add_new_pet_with_not_valid_data_faild(name='Роddма', animal_type='�
     assert status == 200
     assert result['age'] == age
 
+def test_add_new_pet_with_not_valid_data_faild(name='', animal_type='',
+                                     age='', pet_photo='images/Korgi2.jpeg'):
 
+    pet_photo = os.path.join(os.path.dirname(__file__), pet_photo)
+
+    _, auth_key = pf.get_api_key(valid_email, valid_password)
+
+    status, result = pf.add_new_pet(auth_key, name, animal_type, age, pet_photo)
+
+    assert status == 200
+    assert result['age'] == age
+    assert result['name'] == name
+    assert result['animal_type'] == animal_type
+
+def test_post_change_pet_foto_faild(pet_photo='files/text.txt'):
+
+    pet_photo = os.path.join(os.path.dirname(__file__), pet_photo)
+
+    _, auth_key = pf.get_api_key(valid_email, valid_password)
+    _, my_pets = pf.get_list_of_pets(auth_key, "my_pets")
+
+    if len(my_pets['pets']) == 0:
+        pf.add_new_pet_without_photo(auth_key, "Корги", "пес", "3")
+        _, my_pets = pf.get_list_of_pets(auth_key, "my_pets")
 
 
 
