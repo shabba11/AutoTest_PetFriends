@@ -70,5 +70,21 @@ def test_get_all_pets_with_invalid_filter(filter='cat'):
 
     assert status == 500
 
+def test_add_new_pet_with_not_valid_data_faild(name='Роddма', animal_type='белка',
+                                     age='А', pet_photo='images/Korgi.jpg'):
+
+    pet_photo = os.path.join(os.path.dirname(__file__), pet_photo)
+
+    _, auth_key = pf.get_api_key(valid_email, valid_password)
+
+    status, result = pf.add_new_pet(auth_key, name, animal_type, age, pet_photo)
+
+    assert status == 200
+    assert result['age'] == age
+
+
+
+
+
 
 
