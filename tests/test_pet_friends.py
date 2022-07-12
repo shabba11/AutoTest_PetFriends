@@ -107,6 +107,77 @@ def test_post_change_pet_foto_faild(pet_photo='files/text.txt'):
         pf.add_new_pet_without_photo(auth_key, "Корги", "пес", "3")
         _, my_pets = pf.get_list_of_pets(auth_key, "my_pets")
 
+def test_delete_not_pet():
+
+    _, auth_key = pf.get_api_key(valid_email, valid_password)
+    _, pets = pf.get_list_of_pets(auth_key, '')
+
+    if len(pets['pets']) == 0:
+        raise Exception("There is no pets")
+
+    pet_id = pets['pets'][0]['id']
+    status, _ = pf.delete_pet(auth_key, pet_id)
+
+    _, pets = pf.get_list_of_pets(auth_key, '')
+
+    assert status == 200
+    assert pet_id not in pets.values()
+
+def test_add_new_pet_with_long_name(name='алапапльиьалууцьотвыаслыотвяшоятмдчоатмвочдатмвчодалтмчводлатмвочлатмвочалтмвчолатмвчтдаолтмчалотм',
+                                    animal_type='сова',
+                                    age='2', pet_photo='images/Korgi.jpg'):
+
+    pet_photo = os.path.join(os.path.dirname(__file__), pet_photo)
+
+    _, auth_key = pf.get_api_key(valid_email, valid_password)
+
+    status, result = pf.add_new_pet(auth_key, name, animal_type, age, pet_photo)
+
+    assert status == 200
+
+def test_add_new_pet_with_minus_age(name='собака', animal_type='корги',
+                                     age='-9', pet_photo='images/Korgi.jpg'):
+
+    pet_photo = os.path.join(os.path.dirname(__file__), pet_photo)
+
+    _, auth_key = pf.get_api_key(valid_email, valid_password)
+
+    status, result = pf.add_new_pet(auth_key, name, animal_type, age, pet_photo)
+
+    assert status == 200
+    assert age in result['age']
+    assert int(result['age']) < 0
+
+def test_delete_all_pets():
+
+    _, auth_key = pf.get_api_key(valid_email, valid_password)
+    _, my_pets = pf.get_list_of_pets(auth_key, "my_pets")
+
+    while len(my_pets['pets']) > 0:
+        pet_id = my_pets['pets'][0]['id']
+        _, my_pets = pf.get_list_of_pets(auth_key, "my_pets")
+        status, _ = pf.delete_pet(auth_key, pet_id)
+        if len(my_pets['pets']) == 0:
+            break
+
+    _, my_pets = pf.get_list_of_pets(auth_key, "my_pets")
+
+    assert status == 200
+    assert pet_id not in my_pets.values()
+
+def test_add_new_pet_with_not_valid_data_faild_no_photo_file(name='', animal_type='',
+                                     age='', pet_photo='files/text.txt'):
+
+    pet_photo = os.path.join(os.path.dirname(__file__), pet_photo)
+
+    _, auth_key = pf.get_api_key(valid_email, valid_password)
+
+    status, result = pf.add_new_pet(auth_key, name, animal_type, age, pet_photo)
+
+    assert status == 200
+    assert result['age'] == age
+    assert result['name'] == name
+    assert result['animal_type'] == animal_type
 
 
 
